@@ -119,9 +119,10 @@
         </div>
         <p id="bottom_text" style="position: absolute; top: 82%; left: 10%; bottom: 0; width: 100%; max-width: 80%; text-align: center; color: white; opacity: 70%;"></p>
         <div id="loading_gif" style="position: absolute; transform: translate(-50%, -50%); top: 45%; width: 20%; height: 20%; pointer-events: none; background-position: center; background-repeat: no-repeat; background-size: contain; background-attachment: scroll; background-image: url('loading.gif');"></div>
-        <p id="loading_text" style="position: absolute; top: 60%; bottom: 0; width: 100%; max-width: 100%; text-align: center; color: white;">0%</p>
+        <p id="loading_text" style="position: absolute; top: 60%; bottom: 0; width: 100%; max-width: 100%; text-align: center; color: white; display: none;">0%</p>
         <div class="loading_logo" id="company_logo" style="display: none;"></div>
-        <div class="loading_logo" id="game_logo"></div>
+        <div class="loading_logo" id="game_logo" style="background-image: url('jackpot.png'); width: 50%; height: 50%;"></div>
+        <div class="jackpot" id="jackpot"></div>
         <div class="loading_bar">
           <div class="loading_bar_fill"></div>
         </div>
@@ -286,10 +287,10 @@
           loading_text.style.top = "76%";
           loading_gif.style.display = "none";
 
-          game_logo.style.top = "70%";
+          game_logo.style.top = "65%";
           game_logo.style.left = "50%";
-          game_logo.style.width = "100%"; 
-          game_logo.style.height = "100%";
+          game_logo.style.width = "90%"; 
+          game_logo.style.height = "90%";
         } else if(loading_bar_style == 1) {
           setLoading("10%", "50%", "40%", "40%", "75%", "50%", "70%", "2%", "rgba(255, 255, 255, 0.1)", "#FFF", "0", "0 0 10px rgba(255, 255, 255, 0.5)", "0", "0", "0", "0");
           flag_container.style.top = "20%";
@@ -312,10 +313,10 @@
           loading_gif.style.height = "15%";
           loading_gif.style.left = "50%";
 
-          game_logo.style.top = "70%";
+          game_logo.style.top = "65%";
           game_logo.style.left = "50%";
-          game_logo.style.width = "100%"; 
-          game_logo.style.height = "100%";
+          game_logo.style.width = "90%"; 
+          game_logo.style.height = "90%";
         }
 
       }
