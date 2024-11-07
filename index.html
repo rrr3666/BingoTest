@@ -360,11 +360,39 @@
         });
       };
       document.body.appendChild(unityLoader);
-      document.addEventListener("visibilitychange", function () {
-          if (!document.hidden) {
-              myGameInstance.SendMessage('Daemon', 'ReloadGame');
+
+      let wakeLock = null;
+      async function requestWakeLock() {
+          try {
+              wakeLock = await navigator.wakeLock.request('screen');
+              console.log('Wake Lock активирован');
+              wakeLock.addEventListener('release', () => {
+                  console.log('Wake Lock деактивирован');
+              });
+          } catch (err) {
+                console.error('Не удалось активировать Wake Lock:', err);
           }
-      });
+      }
+
+      function releaseWakeLock() {
+          if (wakeLock !== null) {
+              wakeLock.release().then(() => {
+                  wakeLock = null;
+                  console.log('Wake Lock освобожден');
+              });
+          }
+      }
+
+      // Активируем Wake Lock, когда игра запускается
+      requestWakeLock();
+      document.addEventListener("visibilitychange", function () {
+        if (!document.hidden) {
+            myGameInstance.SendMessage('Daemon', 'ReloadGame');
+            requestWakeLock();
+        } else {
+            releaseWakeLock();
+        }
+    });
     </script>
 </body>
 </html>
