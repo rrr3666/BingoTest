@@ -1,131 +1,134 @@
 <!DOCTYPE html>
 <html lang="en-us">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, user-scalable=no"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, user-scalable=no" />
 
 
     <!-- Спасибо за установку Advanced Templates -->
     <!-- Стой, не спускайся вниз. Залезь мне в сердце, а не в нижние строки код. (feat. Монеточка) -->
 
     <style>
-      /* Убираем выделение по нажатию клавиш */
-      canvas:focus {
-        outline: none;
-      }
-      html, body {
-        /* Убираем отступы */
-        padding: 0;
-        margin: 0;
+        /* Убираем выделение по нажатию клавиш */
+        canvas:focus {
+            outline: none;
+        }
 
-        /* Отключаем скролл и лонгтап на IOS */
-        overflow: hidden;
-        -webkit-touch-callout:none;
-        -webkit-user-select:none;
-        -khtml-user-select:none;
-        -moz-user-select:none;
-        -ms-user-select:none;
-        user-select:none;
-        -webkit-tap-highlight-color:rgba(0,0,0,0);
+        html, body {
+            /* Убираем отступы */
+            padding: 0;
+            margin: 0;
+            /* Отключаем скролл и лонгтап на IOS */
+            overflow: hidden;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+            /* Ставим высоту на 100% */
+            height: 100%;
+            /* Центрируем, если привязана картинка или творим магию, чтобы можно было использовать градиент */
+            background-position-x: 50%;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+            /* Скрываем скролл */
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            scrollbar-height: none;
+        }
+        /* Канвас и загрузочный экран */
+        #canvas {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
 
-        /* Ставим высоту на 100% */
-        height: 100%;
+        .loading_bg {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            /* Центрируем, если привязана картинка или творим магию, чтобы можно было использовать градиент */
+            background-position-x: 50%;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+        }
 
-        /* Центрируем, если привязана картинка или творим магию, чтобы можно было использовать градиент */
-  	background-position-x: 50%;
-  	background-repeat: no-repeat;
- 	background-size: cover;
-        background-attachment: fixed;
+        .loading {
+            position: absolute;
+            /*background-color:red;*/
+        }
 
-        /* Скрываем скролл */
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-        scrollbar-height: none;
-      }
-      /* Канвас и загрузочный экран */
-      #canvas {
-        position: fixed;
-        width: 100%;
-        height: 100%;
-      }
-      .loading_bg {
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        z-index: 1;
-        /* Центрируем, если привязана картинка или творим магию, чтобы можно было использовать градиент */
-  	background-position-x: 50%;
-  	background-repeat: no-repeat;
- 	background-size: cover;
-        background-attachment: fixed;
-      }
-      .loading {
-        position: absolute;
-        /*background-color:red;*/
-      }
-      .loading_bar {
-        position: absolute;
-        z-index: 6;
-        transform: translate(-50%, -50%);
-      }
-      .loading_bar_fill {
-        position: absolute;
-        z-index: 6;
-        width: 0%;
-      	height: 100%;
-        top: 0%;
-        bottom: 0%;
-        left: 0%;
-      }
-      .loading_logo {
-        position: absolute;
-        transform: translate(-50%, -50%);
-        z-index: 6;
-        pointer-events: none;
-        background-position: center;
-  	background-repeat: no-repeat;
- 	background-size: contain;
-        background-attachment: scroll;
-      }
-      p {
-        font-family: Arial, Helvetica, sans-serif;
-        word-wrap: break-word;
-      }
+        .loading_bar {
+            position: absolute;
+            z-index: 6;
+            transform: translate(-50%, -50%);
+        }
+
+        .loading_bar_fill {
+            position: absolute;
+            z-index: 6;
+            width: 0%;
+            height: 100%;
+            top: 0%;
+            bottom: 0%;
+            left: 0%;
+        }
+
+        .loading_logo {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            z-index: 6;
+            pointer-events: none;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: contain;
+            background-attachment: scroll;
+        }
+
+        p {
+            font-family: Arial, Helvetica, sans-serif;
+            word-wrap: break-word;
+        }
     </style>
 
 
-  </head>
-  <body>
+</head>
+<body>
     <canvas id="canvas" class="canvas" tabindex="-1"></canvas>
     <div class="loading_bg">
-      <div class="loading">
-        <div id="flags" style="position: absolute; top: 20%; left: 5%; width: 100%; height: 100%;">
-          <div id="flag1" style="position: absolute; top: 0%; left: 1%; width: 6%; height: 5%; pointer-events: none; background-position: center; background-repeat: no-repeat; background-size: contain; background-attachment: scroll;"></div>
+        <div class="loading">
+            <div id="flags" style="position: absolute; top: 20%; left: 5%; width: 100%; height: 100%;">
+                <div id="flag1" style="position: absolute; top: 0%; left: 1%; width: 6%; height: 5%; pointer-events: none; background-position: center; background-repeat: no-repeat; background-size: contain; background-attachment: scroll;"></div>
 
-          <div id="flag2" style="position: absolute; top: 0%; left: 16%; width: 6%; height: 5%; pointer-events: none; background-position: center; background-repeat: no-repeat; background-size: contain; background-attachment: scroll;"></div>
+                <div id="flag2" style="position: absolute; top: 0%; left: 16%; width: 6%; height: 5%; pointer-events: none; background-position: center; background-repeat: no-repeat; background-size: contain; background-attachment: scroll;"></div>
 
-          <div id="flag3" style="position: absolute; top: 0%; left: 37%; width: 6%; height: 5%; pointer-events: none; background-position: center; background-repeat: no-repeat; background-size: contain; background-attachment: scroll;"></div>
+                <div id="flag3" style="position: absolute; top: 0%; left: 37%; width: 6%; height: 5%; pointer-events: none; background-position: center; background-repeat: no-repeat; background-size: contain; background-attachment: scroll;"></div>
 
-          <div id="flag4" style="position: absolute; top: 0%; left: 53%; width: 6%; height: 5%; pointer-events: none; background-position: center; background-repeat: no-repeat; background-size: contain; background-attachment: scroll;"></div>
+                <div id="flag4" style="position: absolute; top: 0%; left: 53%; width: 6%; height: 5%; pointer-events: none; background-position: center; background-repeat: no-repeat; background-size: contain; background-attachment: scroll;"></div>
 
-          <div id="flag5" style="position: absolute; top: 0%; left: 69%; width: 6%; height: 5%; pointer-events: none; background-position: center; background-repeat: no-repeat; background-size: contain; background-attachment: scroll;"></div>
+                <div id="flag5" style="position: absolute; top: 0%; left: 69%; width: 6%; height: 5%; pointer-events: none; background-position: center; background-repeat: no-repeat; background-size: contain; background-attachment: scroll;"></div>
 
-          <div id="flag6" style="position: absolute; top: 0%; left: 85%; width: 6%; height: 5%; pointer-events: none; background-position: center; background-repeat: no-repeat; background-size: contain; background-attachment: scroll;"></div>
+                <div id="flag6" style="position: absolute; top: 0%; left: 85%; width: 6%; height: 5%; pointer-events: none; background-position: center; background-repeat: no-repeat; background-size: contain; background-attachment: scroll;"></div>
 
-          <div id="flag7" style="position: absolute; top: 0%; left: 85%; width: 6%; height: 5%; pointer-events: none; background-position: center; background-repeat: no-repeat; background-size: contain; background-attachment: scroll;"></div>
+                <div id="flag7" style="position: absolute; top: 0%; left: 85%; width: 6%; height: 5%; pointer-events: none; background-position: center; background-repeat: no-repeat; background-size: contain; background-attachment: scroll;"></div>
 
-          <div id="flag8" style="position: absolute; top: 0%; left: 85%; width: 6%; height: 5%; pointer-events: none; background-position: center; background-repeat: no-repeat; background-size: contain; background-attachment: scroll;"></div>
+                <div id="flag8" style="position: absolute; top: 0%; left: 85%; width: 6%; height: 5%; pointer-events: none; background-position: center; background-repeat: no-repeat; background-size: contain; background-attachment: scroll;"></div>
+            </div>
+            <p id="bottom_text" style="position: absolute; top: 82%; left: 10%; bottom: 0; width: 100%; max-width: 80%; text-align: center; color: white; opacity: 70%;"></p>
+            <div id="loading_gif" style="position: absolute; transform: translate(-50%, -50%); top: 45%; width: 20%; height: 20%; pointer-events: none; background-position: center; background-repeat: no-repeat; background-size: contain; background-attachment: scroll; background-image: url('loading.gif');"></div>
+            <p id="loading_text" style="position: absolute; top: 60%; bottom: 0; width: 100%; max-width: 100%; text-align: center; color: white; display: none;">0%</p>
+            <div class="loading_logo" id="company_logo" style="display: none;"></div>
+            <div class="loading_logo" id="game_logo"></div>
+            <div class="loading_bar">
+                <div class="loading_bar_fill"></div>
+            </div>
         </div>
-        <p id="bottom_text" style="position: absolute; top: 82%; left: 10%; bottom: 0; width: 100%; max-width: 80%; text-align: center; color: white; opacity: 70%;"></p>
-        <div id="loading_gif" style="position: absolute; transform: translate(-50%, -50%); top: 45%; width: 20%; height: 20%; pointer-events: none; background-position: center; background-repeat: no-repeat; background-size: contain; background-attachment: scroll; background-image: url('loading.gif');"></div>
-        <p id="loading_text" style="position: absolute; top: 60%; bottom: 0; width: 100%; max-width: 100%; text-align: center; color: white; display: none;">0%</p>
-        <div class="loading_logo" id="company_logo" style="display: none;"></div>
-        <div class="loading_logo" id="game_logo"></div>
-        <div class="loading_bar">
-          <div class="loading_bar_fill"></div>
-        </div>
-      </div>
     </div>
     <script>
       var canvas = document.querySelector("#canvas");
@@ -174,11 +177,11 @@
 
       // Определение с помощью navigator
       if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-        isDeviceNavigator = true; 
+        isDeviceNavigator = true;
       } else {
         isDeviceNavigator = false;
       }
-      
+
       // Возвращаем фокус, если кликнули по экрану
       window.addEventListener('pointerdown', () => {
         window.focus();
@@ -203,7 +206,7 @@
         company_logo.style.top = logoPositionTop;
         company_logo.style.left = logoPositionLeft;
 
-        company_logo.style.width = logoWidth; 
+        company_logo.style.width = logoWidth;
         company_logo.style.height = logoHeight;
 
         loading_bar.style.top = "50%";
@@ -288,7 +291,7 @@
 
           game_logo.style.top = "75%";
           game_logo.style.left = "50%";
-          game_logo.style.width = "80%"; 
+          game_logo.style.width = "80%";
           game_logo.style.height = "80%";
         } else if(loading_bar_style == 1) {
           setLoading("10%", "50%", "40%", "40%", "75%", "50%", "70%", "2%", "rgba(255, 255, 255, 0.1)", "#FFF", "0", "0 0 10px rgba(255, 255, 255, 0.5)", "0", "0", "0", "0");
@@ -314,7 +317,7 @@
 
           game_logo.style.top = "75%";
           game_logo.style.left = "50%";
-          game_logo.style.width = "80%"; 
+          game_logo.style.width = "80%";
           game_logo.style.height = "80%";
         }
 
@@ -357,6 +360,9 @@
         });
       };
       document.body.appendChild(unityLoader);
-    </script>
-  </body>
+      document.addEventListener("visibilitychange", function () {
+          if (!document.hidden) {
+              unityInstance.SendMessage('Daemon', 'ReloadGame');
+    }</script>
+</body>
 </html>
