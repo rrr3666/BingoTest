@@ -363,6 +363,8 @@
       document.addEventListener("visibilitychange", function () {
           if (!document.hidden) {
               unityInstance.SendMessage('Daemon', 'ReloadGame');
-    }</script>
+          }
+      });
+    </script>
 </body>
 </html>
