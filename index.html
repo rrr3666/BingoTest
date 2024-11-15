@@ -144,270 +144,271 @@
         </div>
     </div>
 </div>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
-    var canvas = document.querySelector("#canvas");
-    var loading_bg = document.querySelector(".loading_bg");
-    var loading = document.querySelector(".loading");
-    var loading_bar = document.querySelector(".loading_bar");
-    var loading_bar_fill = document.querySelector(".loading_bar_fill");
-    var company_logo = document.getElementById("company_logo");
-    var game_logo = document.getElementById("game_logo");
-    var flag_container = document.getElementById("flags");
-    var flags = [document.getElementById("flag1"), document.getElementById("flag2"), document.getElementById("flag3"), document.getElementById("flag4"), document.getElementById("flag5"), document.getElementById("flag6"), document.getElementById("flag7"), document.getElementById("flag8")];
-    var bottom_text = document.getElementById("bottom_text");
-    var loading_gif = document.getElementById("loading_gif");
-    var loading_text = document.getElementById("loading_text");
+  var canvas = document.querySelector("#canvas");
+  var loading_bg = document.querySelector(".loading_bg");
+  var loading = document.querySelector(".loading");
+  var loading_bar = document.querySelector(".loading_bar");
+  var loading_bar_fill = document.querySelector(".loading_bar_fill");
+  var company_logo = document.getElementById("company_logo");
+  var game_logo = document.getElementById("game_logo");
+  var flag_container = document.getElementById("flags");
+  var flags = [document.getElementById("flag1"), document.getElementById("flag2"), document.getElementById("flag3"), document.getElementById("flag4"), document.getElementById("flag5"), document.getElementById("flag6"), document.getElementById("flag7"), document.getElementById("flag8")];
+  var bottom_text = document.getElementById("bottom_text");
+  var loading_gif = document.getElementById("loading_gif");
+  var loading_text = document.getElementById("loading_text");
 
-    // Для того, чтобы текст правильно масштабировался
-    var scaleFactor;
+  // Для того, чтобы текст правильно масштабировался
+  var scaleFactor;
 
-    // Подключаем ATinstance для связи Unity с браузером
-    var ATinstance = null;
+  // Подключаем ATinstance для связи Unity с браузером
+  var ATinstance = null;
 
-    function ATinstanceEnable(callback) {
-        const checkNull = () => {
-            if (ATinstance !== null) {
-                callback();
-            } else {
-                setTimeout(checkNull, 1000);
-            }
-        };
-        checkNull();
-    }
-
-    // Выключаем появление меню при правом клике мыши
-    document.addEventListener('contextmenu', event => event.preventDefault());
-
-    // Проверяем устройство
-    var isDeviceTouch;
-    var isDeviceNavigator;
-
-    // Определение с помощью тач
-    if ('ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-        isDeviceTouch = true;
-    } else {
-        isDeviceTouch = false;
-    }
-
-    // Определение с помощью navigator
-    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-        isDeviceNavigator = true;
-    } else {
-        isDeviceNavigator = false;
-    }
-
-    // Возвращаем фокус, если кликнули по экрану
-    window.addEventListener('pointerdown', () => {
-        window.focus();
-        canvas.focus();
-    });
-    window.addEventListener('touchstart', () => {
-        window.focus();
-        canvas.focus();
-    });
-
-
-    company_logo.style.backgroundImage = "url('company_logo.png')";
-
-    game_logo.style.backgroundImage = "url('game_logo.png')";
-
-    document.body.style.backgroundImage = "url('background.jpg')";
-
-    loading_bg.style.backgroundImage = "url('background.jpg')";
-
-    function setLoading(logoPositionTop, logoPositionLeft, logoWidth, logoHeight, positionTop, positionLeft, width, height, barColor, barFillColor, barBorder, barFillBorder, barBorderRadius, barFillBorderRadius, barBackgroundImage, barBackgroundSize) {
-        // Указываем размер логотипа
-        company_logo.style.top = logoPositionTop;
-        company_logo.style.left = logoPositionLeft;
-
-        company_logo.style.width = logoWidth;
-        company_logo.style.height = logoHeight;
-
-        loading_bar.style.top = "50%";
-        loading_bar.style.left = positionLeft;
-
-        loading_bar.style.width = "80%";
-        loading_bar.style.height = "1%";
-
-        loading_bar.style.backgroundColor = barColor;
-        loading_bar_fill.style.backgroundColor = barFillColor;
-
-        loading_bar.style.boxShadow = barBorder;
-        loading_bar_fill.style.boxShadow = barFillBorder;
-
-        loading_bar.style.borderRadius = barBorderRadius;
-        loading_bar_fill.style.borderRadius = barFillBorderRadius;
-
-        loading_bar.style.backgroundImage = loading_bar_fill.style.backgroundImage = barBackgroundImage;
-        loading_bar.style.backgroundSize = loading_bar_fill.style.backgroundSize = barBackgroundSize;
-    }
-
-    // Фиксация разрешения
-    function lock(object, aspectRatio) {
-        if (window.innerWidth / window.innerHeight > aspectRatio) {
-            object.style.width = window.innerHeight * aspectRatio + "px";
-            object.style.height = "100%";
-            scaleFactor = window.innerHeight * aspectRatio / 20;
-        } else {
-            object.style.width = "100%";
-            object.style.height = window.innerWidth / aspectRatio + "px";
-            scaleFactor = window.innerWidth / aspectRatio / 36;
-        }
-
-        var text = document.getElementsByTagName("p");
-        for (let i = 0; i < text.length; i++) {
-            text[i].style.fontSize = scaleFactor * 0.5 + 'px';
-        }
-
-        // Центрируем
-        object.style.margin = "auto";
-        object.style.top = "0";
-        object.style.left = "0";
-        object.style.bottom = "0";
-        object.style.right = "0";
-    }
-
-    // Настраиваем расположение, размер и оформление полосы с лого
-    var loading_bar_style;
-    var loadingStyleText = '';
-
-    var loadingZeroStrings = ["0"];
-    var loadingOneStrings = ["1"];
-
-    if (loadingZeroStrings.some(i => loadingStyleText.includes(i))) {
-        loading_bar_style = 0;
-    } else if (loadingOneStrings.some(i => loadingStyleText.includes(i))) {
-        loading_bar_style = 1;
-    } else {
-        loading_bar_style = 0;
-    }
-
-
-    // Вызываем апдейт при входе на страницу и изменений размеров окна браузера
-    function Update() {
-
-        lock(loading, 9 / 16);
-        if (loading_bar_style == 0) {
-            setLoading("10%", "50%", "40%", "40%", "75%", "50%", "70%", "2%", "rgba(255, 255, 255, 0.1)", "#FFF", "0", "0 0 10px rgba(255, 255, 255, 0.5)", "0", "0", "0", "0");
-            flag_container.style.top = "20%";
-            for (let i = 0; i < flags.length; i++) {
-                flags[0].style.left = "4%";
-                flags[1].style.left = "15%";
-                flags[2].style.left = "26%";
-                flags[3].style.left = "37%";
-                flags[4].style.left = "48%";
-                flags[5].style.left = "59%";
-                flags[6].style.left = "70%";
-                flags[7].style.left = "81%";
-            }
-            loading_text.style.top = "76%";
-            loading_gif.style.display = "none";
-
-            game_logo.style.top = "75%";
-            game_logo.style.left = "50%";
-            game_logo.style.width = "80%";
-            game_logo.style.height = "80%";
-        } else if (loading_bar_style == 1) {
-            setLoading("10%", "50%", "40%", "40%", "75%", "50%", "70%", "2%", "rgba(255, 255, 255, 0.1)", "#FFF", "0", "0 0 10px rgba(255, 255, 255, 0.5)", "0", "0", "0", "0");
-            flag_container.style.top = "20%";
-            for (let i = 0; i < flags.length; i++) {
-                flags[0].style.left = "4%";
-                flags[1].style.left = "15%";
-                flags[2].style.left = "26%";
-                flags[3].style.left = "37%";
-                flags[4].style.left = "48%";
-                flags[5].style.left = "59%";
-                flags[6].style.left = "70%";
-                flags[7].style.left = "81%";
-            }
-            loading_text.style.display = "none";
-            loading_bar.style.display = "none";
-            loading_bar_fill.style.display = "none";
-            loading_gif.style.display = "block";
-            loading_gif.style.top = "75%";
-            loading_gif.style.width = "15%";
-            loading_gif.style.height = "15%";
-            loading_gif.style.left = "50%";
-
-            game_logo.style.top = "75%";
-            game_logo.style.left = "50%";
-            game_logo.style.width = "80%";
-            game_logo.style.height = "80%";
-        }
-
-    }
-
-    Update();
-    window.addEventListener("resize", (event) => {
-        Update();
-    });
-
-    // Подключаем myGameInstance для связи Unity с браузером
-    var myGameInstance = null;
-
-    // Загрузка файлов
-    var unityLoader = document.createElement("script");
-    unityLoader.src = "Build/BingoTest.loader.js";
-    unityLoader.onload = () => {
-        createUnityInstance(canvas, {
-            dataUrl: "Build/BingoTest.data.unityweb",
-            frameworkUrl: "Build/BingoTest.framework.js.unityweb",
-            codeUrl: "Build/BingoTest.wasm.unityweb",
-            streamingAssetsUrl: "StreamingAssets",
-            companyName: "DefaultCompany",
-            productName: "BingoGame",
-            productVersion: "1.0",
-        }, (progress) => {
-            loading_bar_fill.style.width = 111.2 * progress + "%";
-            loading_text.innerHTML = Math.round(progress * 100) + '%';
-            Update();
-        }).then((unityInstance) => {
-            myGameInstance = unityInstance;
-            ATinstance = unityInstance;
-            loading_bg.style.display = "none";
-            Update();
-
-        }).catch((message) => {
-            console.error(message);
-            console.error("Не удалось загрузить файлы игры, пробуем заново");
-            unityLoader.onload();
-        });
+  function ATinstanceEnable(callback) {
+    const checkNull = () => {
+      if (ATinstance !== null) {
+        callback();
+      } else {
+        setTimeout(checkNull, 1000);
+      }
     };
-    document.body.appendChild(unityLoader);
+    checkNull();
+  }
 
-    // let wakeLock = null;
-    // async function requestWakeLock() {
-    //     try {
-    //         wakeLock = await navigator.wakeLock.request('screen');
-    //         console.log('Wake Lock активирован');
-    //         wakeLock.addEventListener('release', () => {
-    //             console.log('Wake Lock деактивирован');
-    //         });
-    //     } catch (err) {
-    //           console.error('Не удалось активировать Wake Lock:', err);
-    //     }
-    // }
-    //
-    // function releaseWakeLock() {
-    //     if (wakeLock !== null) {
-    //         wakeLock.release().then(() => {
-    //             wakeLock = null;
-    //             console.log('Wake Lock освобожден');
-    //         });
-    //     }
-    // }
-    //
-    // // Активируем Wake Lock, когда игра запускается
-    // requestWakeLock();
+  // Выключаем появление меню при правом клике мыши
+  document.addEventListener('contextmenu', event => event.preventDefault());
 
-    document.addEventListener("visibilitychange", function () {
-        if (!document.hidden) {
-            myGameInstance.SendMessage('Daemon', 'ReloadGame');
-            //     requestWakeLock();
-            // } else {
-            //     releaseWakeLock();
-        }
+  // Проверяем устройство
+  var isDeviceTouch;
+  var isDeviceNavigator;
+
+  // Определение с помощью тач
+  if ('ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+    isDeviceTouch = true;
+  } else {
+    isDeviceTouch = false;
+  }
+
+  // Определение с помощью navigator
+  if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+    isDeviceNavigator = true;
+  } else {
+    isDeviceNavigator = false;
+  }
+
+  // Возвращаем фокус, если кликнули по экрану
+  window.addEventListener('pointerdown', () => {
+    window.focus();
+    canvas.focus();
+  });
+  window.addEventListener('touchstart', () => {
+    window.focus();
+    canvas.focus();
+  });
+
+
+  company_logo.style.backgroundImage = "url('company_logo.png')";
+
+  game_logo.style.backgroundImage = "url('game_logo.png')";
+
+  document.body.style.backgroundImage = "url('background.jpg')";
+
+  loading_bg.style.backgroundImage = "url('background.jpg')";
+
+  function setLoading(logoPositionTop, logoPositionLeft, logoWidth, logoHeight, positionTop, positionLeft, width, height, barColor, barFillColor, barBorder, barFillBorder, barBorderRadius, barFillBorderRadius, barBackgroundImage, barBackgroundSize) {
+    // Указываем размер логотипа
+    company_logo.style.top = logoPositionTop;
+    company_logo.style.left = logoPositionLeft;
+
+    company_logo.style.width = logoWidth;
+    company_logo.style.height = logoHeight;
+
+    loading_bar.style.top = "50%";
+    loading_bar.style.left = positionLeft;
+
+    loading_bar.style.width = "80%";
+    loading_bar.style.height = "1%";
+
+    loading_bar.style.backgroundColor = barColor;
+    loading_bar_fill.style.backgroundColor = barFillColor;
+
+    loading_bar.style.boxShadow = barBorder;
+    loading_bar_fill.style.boxShadow = barFillBorder;
+
+    loading_bar.style.borderRadius = barBorderRadius;
+    loading_bar_fill.style.borderRadius = barFillBorderRadius;
+
+    loading_bar.style.backgroundImage = loading_bar_fill.style.backgroundImage = barBackgroundImage;
+    loading_bar.style.backgroundSize = loading_bar_fill.style.backgroundSize = barBackgroundSize;
+  }
+
+  // Фиксация разрешения
+  function lock(object, aspectRatio) {
+    if (window.innerWidth / window.innerHeight > aspectRatio) {
+      object.style.width = window.innerHeight * aspectRatio + "px";
+      object.style.height = "100%";
+      scaleFactor = window.innerHeight * aspectRatio / 20;
+    } else {
+      object.style.width = "100%";
+      object.style.height = window.innerWidth / aspectRatio + "px";
+      scaleFactor = window.innerWidth / aspectRatio / 36;
+    }
+
+    var text = document.getElementsByTagName("p");
+    for (let i = 0; i < text.length; i++) {
+      text[i].style.fontSize = scaleFactor * 0.5 + 'px';
+    }
+
+    // Центрируем
+    object.style.margin = "auto";
+    object.style.top = "0";
+    object.style.left = "0";
+    object.style.bottom = "0";
+    object.style.right = "0";
+  }
+
+  // Настраиваем расположение, размер и оформление полосы с лого
+  var loading_bar_style;
+  var loadingStyleText = '';
+
+  var loadingZeroStrings = ["0"];
+  var loadingOneStrings = ["1"];
+
+  if (loadingZeroStrings.some(i => loadingStyleText.includes(i))) {
+    loading_bar_style = 0;
+  } else if (loadingOneStrings.some(i => loadingStyleText.includes(i))) {
+    loading_bar_style = 1;
+  } else {
+    loading_bar_style = 0;
+  }
+
+
+  // Вызываем апдейт при входе на страницу и изменений размеров окна браузера
+  function Update() {
+
+    lock(loading, 9 / 16);
+    if (loading_bar_style == 0) {
+      setLoading("10%", "50%", "40%", "40%", "75%", "50%", "70%", "2%", "rgba(255, 255, 255, 0.1)", "#FFF", "0", "0 0 10px rgba(255, 255, 255, 0.5)", "0", "0", "0", "0");
+      flag_container.style.top = "20%";
+      for (let i = 0; i < flags.length; i++) {
+        flags[0].style.left = "4%";
+        flags[1].style.left = "15%";
+        flags[2].style.left = "26%";
+        flags[3].style.left = "37%";
+        flags[4].style.left = "48%";
+        flags[5].style.left = "59%";
+        flags[6].style.left = "70%";
+        flags[7].style.left = "81%";
+      }
+      loading_text.style.top = "76%";
+      loading_gif.style.display = "none";
+
+      game_logo.style.top = "75%";
+      game_logo.style.left = "50%";
+      game_logo.style.width = "80%";
+      game_logo.style.height = "80%";
+    } else if (loading_bar_style == 1) {
+      setLoading("10%", "50%", "40%", "40%", "75%", "50%", "70%", "2%", "rgba(255, 255, 255, 0.1)", "#FFF", "0", "0 0 10px rgba(255, 255, 255, 0.5)", "0", "0", "0", "0");
+      flag_container.style.top = "20%";
+      for (let i = 0; i < flags.length; i++) {
+        flags[0].style.left = "4%";
+        flags[1].style.left = "15%";
+        flags[2].style.left = "26%";
+        flags[3].style.left = "37%";
+        flags[4].style.left = "48%";
+        flags[5].style.left = "59%";
+        flags[6].style.left = "70%";
+        flags[7].style.left = "81%";
+      }
+      loading_text.style.display = "none";
+      loading_bar.style.display = "none";
+      loading_bar_fill.style.display = "none";
+      loading_gif.style.display = "block";
+      loading_gif.style.top = "75%";
+      loading_gif.style.width = "15%";
+      loading_gif.style.height = "15%";
+      loading_gif.style.left = "50%";
+
+      game_logo.style.top = "75%";
+      game_logo.style.left = "50%";
+      game_logo.style.width = "80%";
+      game_logo.style.height = "80%";
+    }
+
+  }
+
+  Update();
+  window.addEventListener("resize", (event) => {
+    Update();
+  });
+
+  // Подключаем myGameInstance для связи Unity с браузером
+  var myGameInstance = null;
+
+  // Загрузка файлов
+  var unityLoader = document.createElement("script");
+  unityLoader.src = "Build/BingoTest.loader.js";
+  unityLoader.onload = () => {
+    createUnityInstance(canvas, {
+      dataUrl: "Build/BingoTest.data.unityweb",
+      frameworkUrl: "Build/BingoTest.framework.js.unityweb",
+      codeUrl: "Build/BingoTest.wasm.unityweb",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "DefaultCompany",
+      productName: "BingoGame",
+      productVersion: "1.0",
+    }, (progress) => {
+      loading_bar_fill.style.width = 111.2 * progress + "%";
+      loading_text.innerHTML = Math.round(progress * 100) + '%';
+      Update();
+    }).then((unityInstance) => {
+      myGameInstance = unityInstance;
+      ATinstance = unityInstance;
+      loading_bg.style.display = "none";
+      Update();
+
+    }).catch((message) => {
+      console.error(message);
+      console.error("Не удалось загрузить файлы игры, пробуем заново");
+      unityLoader.onload();
     });
+  };
+  document.body.appendChild(unityLoader);
+
+  // let wakeLock = null;
+  // async function requestWakeLock() {
+  //     try {
+  //         wakeLock = await navigator.wakeLock.request('screen');
+  //         console.log('Wake Lock активирован');
+  //         wakeLock.addEventListener('release', () => {
+  //             console.log('Wake Lock деактивирован');
+  //         });
+  //     } catch (err) {
+  //           console.error('Не удалось активировать Wake Lock:', err);
+  //     }
+  // }
+  //
+  // function releaseWakeLock() {
+  //     if (wakeLock !== null) {
+  //         wakeLock.release().then(() => {
+  //             wakeLock = null;
+  //             console.log('Wake Lock освобожден');
+  //         });
+  //     }
+  // }
+  //
+  // // Активируем Wake Lock, когда игра запускается
+  // requestWakeLock();
+
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden) {
+      myGameInstance.SendMessage('Daemon', 'ReloadGame');
+      //     requestWakeLock();
+      // } else {
+      //     releaseWakeLock();
+    }
+  });
 </script>
 </body>
 </html>
